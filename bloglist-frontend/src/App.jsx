@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
-
+import "./index.css";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
@@ -11,6 +11,10 @@ const App = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newAuthor, setNewAuthor] = useState("");
   const [newUrl, setNewUrl] = useState("");
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null,
+  });
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -23,6 +27,12 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+  const Notification = ({ notification }) => {
+    if (notification.message === null) {
+      return null;
+    }
+    return <div className={notification.type}>{notification.message}</div>;
+  };
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
@@ -58,7 +68,10 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (error) {
-      console.error("Login failed:", error);
+      setNotification({ message: "wrong username or password", type: "error" });
+      setTimeout(() => {
+        setNotification({ message: null, type: null });
+      }, 5000);
     }
   };
   const addNewBlogForm = () => (
@@ -109,8 +122,21 @@ const App = () => {
       setNewTitle("");
       setNewAuthor("");
       setNewUrl("");
+      setNotification({
+        message: `a new blog ${newTitle} by ${newAuthor} added`,
+        type: "added",
+      });
+      setTimeout(() => {
+        setNotification({ message: null, type: null });
+      }, 5000);
     } catch (error) {
-      console.log(error.message);
+      setNotification({
+        message: `Failed to create blog, Please try again`,
+        type: "error",
+      });
+      setTimeout(() => {
+        setNotification({ message: null, type: null });
+      }, 5000);
     }
   };
   return (
@@ -118,12 +144,14 @@ const App = () => {
       {!user && (
         <div>
           <h2>Log in to application</h2>
+          <Notification notification={notification} />
           {loginForm()}
         </div>
       )}
       {user && (
         <div>
           <h2>blogs</h2>
+          <Notification notification={notification} />
           <p>
             {user.name} logged in
             <button
