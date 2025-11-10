@@ -1,20 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import BlogForm from "./components/BlogForm";
+import Togglable from "./components/Togglable";
 import "./index.css";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [newTitle, setNewTitle] = useState("");
-  const [newAuthor, setNewAuthor] = useState("");
-  const [newUrl, setNewUrl] = useState("");
+  // const [newTitle, setNewTitle] = useState("");
+  // const [newAuthor, setNewAuthor] = useState("");
+  // const [newUrl, setNewUrl] = useState("");
   const [notification, setNotification] = useState({
     message: null,
     type: null,
   });
+
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -74,56 +78,14 @@ const App = () => {
       }, 5000);
     }
   };
-  const addNewBlogForm = () => (
-    <form onSubmit={handleAddNewBlog}>
-      <div>
-        <label>
-          title
-          <input
-            type="text"
-            value={newTitle}
-            onChange={({ target }) => setNewTitle(target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          author
-          <input
-            type="text"
-            value={newAuthor}
-            onChange={({ target }) => setNewAuthor(target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          url
-          <input
-            type="text"
-            value={newUrl}
-            onChange={({ target }) => setNewUrl(target.value)}
-          />
-        </label>
-      </div>
-      <button type="submit">create</button>
-    </form>
-  );
-  const handleAddNewBlog = async (event) => {
-    event.preventDefault();
+
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
     try {
-      const blogObject = {
-        title: newTitle,
-        author: newAuthor,
-        url: newUrl,
-      };
       const blog = await blogService.create(blogObject);
       setBlogs(blogs.concat(blog));
-      setNewTitle("");
-      setNewAuthor("");
-      setNewUrl("");
       setNotification({
-        message: `a new blog ${newTitle} by ${newAuthor} added`,
+        message: `A new blog "${blogObject.title}" by ${blogObject.author} added`,
         type: "added",
       });
       setTimeout(() => {
@@ -138,6 +100,68 @@ const App = () => {
         setNotification({ message: null, type: null });
       }, 5000);
     }
+
+    // const handleAddNewBlog = async (event) => {
+    //   event.preventDefault();
+    //   try {
+    //     const blogObject = {
+    //       title: newTitle,
+    //       author: newAuthor,
+    //       url: newUrl,
+    //     };
+    //     const blog = await blogService.create(blogObject);
+    //     setBlogs(blogs.concat(blog));
+    //     setNewTitle("");
+    //     setNewAuthor("");
+    //     setNewUrl("");
+    //     setNotification({
+    //       message: `a new blog ${newTitle} by ${newAuthor} added`,
+    //       type: "added",
+    //     });
+    //     setTimeout(() => {
+    //       setNotification({ message: null, type: null });
+    //     }, 5000);
+    //   } catch (error) {
+    //     setNotification({
+    //       message: `Failed to create blog, Please try again`,
+    //       type: "error",
+    //     });
+    //     setTimeout(() => {
+    //       setNotification({ message: null, type: null });
+    //     }, 5000);
+    //   }
+    // };
+
+    const handleAddNewBlog = async (event) => {
+      event.preventDefault();
+      try {
+        const blogObject = {
+          title: newTitle,
+          author: newAuthor,
+          url: newUrl,
+        };
+        const blog = await blogService.create(blogObject);
+        setBlogs(blogs.concat(blog));
+        setNewTitle("");
+        setNewAuthor("");
+        setNewUrl("");
+        setNotification({
+          message: `a new blog ${newTitle} by ${newAuthor} added`,
+          type: "added",
+        });
+        setTimeout(() => {
+          setNotification({ message: null, type: null });
+        }, 5000);
+      } catch (error) {
+        setNotification({
+          message: `Failed to create blog, Please try again`,
+          type: "error",
+        });
+        setTimeout(() => {
+          setNotification({ message: null, type: null });
+        }, 5000);
+      }
+    };
   };
   return (
     <div>
@@ -163,9 +187,11 @@ const App = () => {
               logout
             </button>
           </p>
+
           <div>
-            <h2>create new</h2>
-            {addNewBlogForm()}
+            <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+              <BlogForm createBlog={addBlog} />
+            </Togglable>
           </div>
 
           {blogs.map((blog) => (
