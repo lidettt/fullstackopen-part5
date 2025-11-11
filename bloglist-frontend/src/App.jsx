@@ -100,68 +100,6 @@ const App = () => {
         setNotification({ message: null, type: null });
       }, 5000);
     }
-
-    // const handleAddNewBlog = async (event) => {
-    //   event.preventDefault();
-    //   try {
-    //     const blogObject = {
-    //       title: newTitle,
-    //       author: newAuthor,
-    //       url: newUrl,
-    //     };
-    //     const blog = await blogService.create(blogObject);
-    //     setBlogs(blogs.concat(blog));
-    //     setNewTitle("");
-    //     setNewAuthor("");
-    //     setNewUrl("");
-    //     setNotification({
-    //       message: `a new blog ${newTitle} by ${newAuthor} added`,
-    //       type: "added",
-    //     });
-    //     setTimeout(() => {
-    //       setNotification({ message: null, type: null });
-    //     }, 5000);
-    //   } catch (error) {
-    //     setNotification({
-    //       message: `Failed to create blog, Please try again`,
-    //       type: "error",
-    //     });
-    //     setTimeout(() => {
-    //       setNotification({ message: null, type: null });
-    //     }, 5000);
-    //   }
-    // };
-
-    const handleAddNewBlog = async (event) => {
-      event.preventDefault();
-      try {
-        const blogObject = {
-          title: newTitle,
-          author: newAuthor,
-          url: newUrl,
-        };
-        const blog = await blogService.create(blogObject);
-        setBlogs(blogs.concat(blog));
-        setNewTitle("");
-        setNewAuthor("");
-        setNewUrl("");
-        setNotification({
-          message: `a new blog ${newTitle} by ${newAuthor} added`,
-          type: "added",
-        });
-        setTimeout(() => {
-          setNotification({ message: null, type: null });
-        }, 5000);
-      } catch (error) {
-        setNotification({
-          message: `Failed to create blog, Please try again`,
-          type: "error",
-        });
-        setTimeout(() => {
-          setNotification({ message: null, type: null });
-        }, 5000);
-      }
-    };
   };
   return (
     <div>
