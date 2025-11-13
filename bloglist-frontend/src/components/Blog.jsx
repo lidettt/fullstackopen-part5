@@ -11,13 +11,7 @@ const Blog = ({ blog, expandedId, onToggle, handleLike }) => {
   return (
     <div style={blogStyle}>
       <div>
-        {!isExpanded ? (
-          <span>
-            {blog.title} {blog.author}
-          </span>
-        ) : (
-          <span>{blog.title}</span>
-        )}
+        {blog.title} {blog.author}
         <button
           onClick={() => {
             onToggle(blog.id);
@@ -31,7 +25,8 @@ const Blog = ({ blog, expandedId, onToggle, handleLike }) => {
             <p>
               likes {blog.likes} <button onClick={handleLike}>like</button>
             </p>
-            <p> {blog.author}</p>
+
+            <p>{blog.user?.username || "unknown user"}</p>
           </div>
         )}
       </div>
