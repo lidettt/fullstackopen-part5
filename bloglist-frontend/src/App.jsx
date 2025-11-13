@@ -10,9 +10,7 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  // const [newTitle, setNewTitle] = useState("");
-  // const [newAuthor, setNewAuthor] = useState("");
-  // const [newUrl, setNewUrl] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
   const [notification, setNotification] = useState({
     message: null,
     type: null,
@@ -101,6 +99,9 @@ const App = () => {
       }, 5000);
     }
   };
+  const toggleButton = (id) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
   return (
     <div>
       {!user && (
@@ -133,7 +134,12 @@ const App = () => {
           </div>
 
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              expandedId={expandedId}
+              onToggle={toggleButton}
+            />
           ))}
         </div>
       )}
