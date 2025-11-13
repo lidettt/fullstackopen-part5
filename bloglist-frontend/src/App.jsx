@@ -29,6 +29,7 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
   const Notification = ({ notification }) => {
     if (notification.message === null) {
       return null;
@@ -147,7 +148,7 @@ const App = () => {
             </Togglable>
           </div>
 
-          {blogs.map((blog) => (
+          {sortedBlogs.map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
