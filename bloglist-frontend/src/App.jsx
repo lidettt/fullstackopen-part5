@@ -102,6 +102,20 @@ const App = () => {
   const toggleButton = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      id: blog.id,
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+    };
+    const returnedBlog = await blogService.update(blog.id, updatedBlog);
+    setBlogs(
+      blogs.map((blog) => (blog.id === returnedBlog.id ? returnedBlog : blog))
+    );
+  };
   return (
     <div>
       {!user && (
@@ -139,6 +153,7 @@ const App = () => {
               blog={blog}
               expandedId={expandedId}
               onToggle={toggleButton}
+              handleLike={() => handleLike(blog)}
             />
           ))}
         </div>
