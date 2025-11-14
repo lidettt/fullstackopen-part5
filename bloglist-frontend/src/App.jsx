@@ -117,6 +117,32 @@ const App = () => {
       blogs.map((blog) => (blog.id === returnedBlog.id ? returnedBlog : blog))
     );
   };
+  const handleRemove = async (blog) => {
+    try {
+      if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+        await blogService.remove(blog.id);
+        setBlogs((prevBlogs) => prevBlogs.filter((b) => b.id !== blog.id));
+      }
+    } catch (error) {
+      if (error.response && error.response.data.error) {
+        setNotification({
+          message: error.response.data.error,
+          type: "error",
+        });
+        setTimeout(() => {
+          setNotification({ message: null, type: null });
+        }, 5000);
+      } else {
+        setNotification({
+          message: "oh no something went wrong",
+          type: "error",
+        });
+        setTimeout(() => {
+          setNotification({ message: null, type: null });
+        }, 5000);
+      }
+    }
+  };
   return (
     <div>
       {!user && (
@@ -155,6 +181,7 @@ const App = () => {
               expandedId={expandedId}
               onToggle={toggleButton}
               handleLike={() => handleLike(blog)}
+              handleRemove={() => handleRemove(blog)}
             />
           ))}
         </div>
