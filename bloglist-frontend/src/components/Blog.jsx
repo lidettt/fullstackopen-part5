@@ -1,23 +1,23 @@
 const Blog = ({ blog, expandedId, onToggle, handleLike, handleRemove }) => {
-  const isExpanded = expandedId === blog.id
+  const isExpanded = expandedId === blog.id;
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
-    border: 'solid',
+    border: "solid",
     borderWidth: 1,
     marginBottom: 5,
-  }
+  };
 
   return (
     <div style={blogStyle}>
-      <div>
-        {blog.title} {blog.author}
+      <div className="blog">
+        <span>{blog.title}</span> <span>{blog.author}</span>
         <button
           onClick={() => {
-            onToggle(blog.id)
+            onToggle(blog.id);
           }}
         >
-          {isExpanded ? 'hide' : 'view'}
+          {isExpanded ? "hide" : "view"}
         </button>
         {isExpanded && (
           <div>
@@ -26,12 +26,12 @@ const Blog = ({ blog, expandedId, onToggle, handleLike, handleRemove }) => {
               likes {blog.likes} <button onClick={handleLike}>like</button>
             </p>
 
-            <p>{blog.user?.username || 'unknown user'}</p>
+            <p>{blog.user?.username || "unknown user"}</p>
             <button onClick={handleRemove}>remove</button>
           </div>
         )}
       </div>
     </div>
-  )
-}
-export default Blog
+  );
+};
+export default Blog;
