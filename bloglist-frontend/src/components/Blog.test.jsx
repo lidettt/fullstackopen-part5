@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import Blog from "./Blog";
 import userEvent from "@testing-library/user-event";
+import BlogForm from "./BlogForm";
 
 test("renders content", () => {
   const blog = {
@@ -94,4 +95,23 @@ test("check if the like button is clicked twice, the event handler the component
 
   //check if the handleLike receive props 2 times
   expect(mockLikeHandler).toHaveBeenCalledTimes(2);
+});
+
+test("check, that the form calls the event handler if it received as props with the right details when a new blog is created", async () => {
+  const mockSubmitHandler = vi.fn();
+  const user = userEvent.setup();
+  render(<BlogForm createBlog={mockSubmitHandler} />);
+
+  await user.type(screen.getByLabelText("title"), "Testing the blog component");
+  await user.type(screen.getByLabelText("author"), "Lidet Tester");
+  await user.type(screen.getByLabelText("url"), "https://example.com");
+
+  await user.click(screen.getByRole("button", { name: /create/i }));
+
+  expect(mockSubmitHandler).toHaveBeenCalledTimes(1);
+  expect(mockSubmitHandler).toHaveBeenCalledWith({
+    title: "Testing the blog component",
+    author: "Lidet Tester",
+    url: "https://example.com",
+  });
 });
