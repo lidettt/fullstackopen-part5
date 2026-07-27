@@ -63,17 +63,34 @@ describe("Blog app", () => {
         page.getByText("new blog can be created lidet"),
       ).toBeVisible();
     });
+    describe("and a blog exists", () => {
+      beforeEach(async ({ page }) => {
+        await page.getByRole("button", { name: "create new blog" }).click();
+        await page.getByLabel("title").fill("new blog can be created");
+        await page.getByLabel("author").fill("lidet");
+        await page.getByLabel("url").fill("newblog.com");
+        await page.getByRole("button", { name: "create" }).click();
+      });
 
-    test("the blog can be liked", async ({ page }) => {
-      await page.getByRole("button", { name: "create new blog" }).click();
-      await page.getByLabel("title").fill("new blog can be created");
-      await page.getByLabel("author").fill("lidet");
-      await page.getByLabel("url").fill("newblog.com");
-      await page.getByRole("button", { name: "create" }).click();
-      await page.getByRole("button", { name: "view" }).click();
-      await page.getByRole("button", { name: "like" }).click();
+      test("the blog can be liked", async ({ page }) => {
+        await page.getByRole("button", { name: "view" }).click();
+        await page.getByRole("button", { name: "like" }).click();
 
-      await expect(page.getByText("likes 1")).toBeVisible();
+        await expect(page.getByText("likes 1")).toBeVisible();
+      });
+
+      test("the blog can be deleted by the user who added it", async ({
+        page,
+      }) => {
+        await page.getByRole("button", { name: "view" }).click();
+
+        page.on("dialog", (dialog) => dialog.accept());
+        await page.getByRole("button", { name: "remove" }).click();
+
+        await expect(
+          page.getByText("new blog can be created lidet"),
+        ).not.toBeVisible();
+      });
     });
   });
 });
