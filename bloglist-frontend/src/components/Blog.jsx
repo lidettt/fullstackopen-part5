@@ -1,4 +1,11 @@
-const Blog = ({ blog, expandedId, onToggle, handleLike, handleRemove }) => {
+const Blog = ({
+  blog,
+  expandedId,
+  onToggle,
+  user,
+  handleLike,
+  handleRemove,
+}) => {
   const isExpanded = expandedId === blog.id;
   const blogStyle = {
     paddingTop: 10,
@@ -27,7 +34,9 @@ const Blog = ({ blog, expandedId, onToggle, handleLike, handleRemove }) => {
             </p>
 
             <p>{blog.user?.username || "unknown user"}</p>
-            <button onClick={handleRemove}>remove</button>
+            {user.username === blog.user?.username && (
+              <button onClick={handleRemove}>remove</button>
+            )}
           </div>
         )}
       </div>
