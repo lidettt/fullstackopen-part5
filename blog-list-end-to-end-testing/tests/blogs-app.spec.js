@@ -63,5 +63,17 @@ describe("Blog app", () => {
         page.getByText("new blog can be created lidet"),
       ).toBeVisible();
     });
+
+    test("the blog can be liked", async ({ page }) => {
+      await page.getByRole("button", { name: "create new blog" }).click();
+      await page.getByLabel("title").fill("new blog can be created");
+      await page.getByLabel("author").fill("lidet");
+      await page.getByLabel("url").fill("newblog.com");
+      await page.getByRole("button", { name: "create" }).click();
+      await page.getByRole("button", { name: "view" }).click();
+      await page.getByRole("button", { name: "like" }).click();
+
+      await expect(page.getByText("likes 1")).toBeVisible();
+    });
   });
 });
