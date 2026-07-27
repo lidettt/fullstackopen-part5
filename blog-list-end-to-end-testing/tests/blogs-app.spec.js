@@ -91,6 +91,30 @@ describe("Blog app", () => {
           page.getByText("new blog can be created lidet"),
         ).not.toBeVisible();
       });
+
+      test("the blog's delete button available to only the user who added it", async ({
+        page,
+        request,
+      }) => {
+        await request.post("http://localhost:3003/api/users", {
+          data: {
+            username: "lidet-test-2",
+            name: "Voeun Chanlidet",
+            password: "lidet123",
+          },
+        });
+        await page.getByRole("button", { name: "logout" }).click();
+
+        await page.getByLabel("username").fill("lidet-test-2");
+        await page.getByLabel("password").fill("lidet123");
+        await page.getByRole("button", { name: "login" }).click();
+
+        await page.getByRole("button", { name: "view" }).click();
+
+        await expect(
+          page.getByRole("button", { name: "remove" }),
+        ).not.toBeVisible();
+      });
     });
   });
 });
