@@ -115,6 +115,57 @@ describe("Blog app", () => {
           page.getByRole("button", { name: "remove" }),
         ).not.toBeVisible();
       });
+
+      test("blogs are arranged in the order according to the likes", async ({
+        page,
+      }) => {
+        // like the first blog one time
+        const firstBlog = page
+          .locator(".blog")
+          .filter({ hasText: "new blog can be created" });
+        await firstBlog.getByRole("button", { name: "view" }).click();
+        await firstBlog.getByRole("button", { name: "like" }).click();
+        await expect(firstBlog.getByText("likes 1")).toBeVisible();
+
+        //create & like the second blog 3 times
+        await page.getByRole("button", { name: "create new blog" }).click();
+        await page.getByLabel("title").fill("second blog");
+        await page.getByLabel("author").fill("lidet");
+        await page.getByLabel("url").fill("secondblog.com");
+        await page.getByRole("button", { name: "create" }).click();
+        const secondBlog = page
+          .locator(".blog")
+          .filter({ hasText: "second blog" });
+        await secondBlog.getByRole("button", { name: "view" }).click();
+        await secondBlog.getByRole("button", { name: "like" }).click();
+        await expect(secondBlog.getByText("likes 1")).toBeVisible();
+        await secondBlog.getByRole("button", { name: "like" }).click();
+        await expect(secondBlog.getByText("likes 2")).toBeVisible();
+        await secondBlog.getByRole("button", { name: "like" }).click();
+        await expect(secondBlog.getByText("likes 3")).toBeVisible();
+
+        //create & like the third blog 2 times
+        await page.getByRole("button", { name: "create new blog" }).click();
+        await page.getByLabel("title").fill("third blog");
+        await page.getByLabel("author").fill("lidet");
+        await page.getByLabel("url").fill("thirdblog.com");
+        await page.getByRole("button", { name: "create" }).click();
+        const thirdBlog = page
+          .locator(".blog")
+          .filter({ hasText: "third blog" });
+        await thirdBlog.getByRole("button", { name: "view" }).click();
+        await thirdBlog.getByRole("button", { name: "like" }).click();
+        await expect(thirdBlog.getByText("likes 1")).toBeVisible();
+        await thirdBlog.getByRole("button", { name: "like" }).click();
+        await expect(thirdBlog.getByText("likes 2")).toBeVisible();
+
+        const allBlogs = page.locator(".blog");
+        await expect(allBlogs.nth(0).getByText("second blog")).toBeVisible();
+        await expect(allBlogs.nth(1).getByText("third blog")).toBeVisible();
+        await expect(
+          allBlogs.nth(2).getByText("new blog can be created"),
+        ).toBeVisible();
+      });
     });
   });
 });
