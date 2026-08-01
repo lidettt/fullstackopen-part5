@@ -1,27 +1,18 @@
 import Blog from "./Blog";
+import { Link } from "react-router-dom";
 
-const BlogList = ({
-  sortedBlogs,
-  user,
-  expandedId,
-  toggleButton,
-  handleLike,
-  handleRemove,
-}) => {
+const BlogList = ({ sortedBlogs }) => {
+  if (!sortedBlogs) return null;
   return (
     <div>
       <h2>blogs</h2>
-      {sortedBlogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          user={user}
-          expandedId={expandedId}
-          onToggle={toggleButton}
-          handleLike={() => handleLike(blog)}
-          handleRemove={() => handleRemove(blog)}
-        />
-      ))}
+      <ul>
+        {sortedBlogs.map((blog) => (
+          <li key={blog.id}>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

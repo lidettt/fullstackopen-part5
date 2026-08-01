@@ -4,7 +4,7 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useNavigate, useMatch } from "react-router-dom";
 import BlogList from "./components/BlogList";
 import "./index.css";
 import LoginForm from "./components/LoginForm";
@@ -35,6 +35,12 @@ const App = () => {
     }
   }, []);
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+
+  const match = useMatch("/blogs/:id");
+
+  const blog = match
+    ? sortedBlogs.find((blog) => blog.id === match.params.id)
+    : null;
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -149,16 +155,15 @@ const App = () => {
         )}
       </div>
       <Routes>
+        <Route path="/" element={<BlogList sortedBlogs={sortedBlogs} />} />
         <Route
-          path="/"
+          path="/blogs/:id"
           element={
-            <BlogList
-              sortedBlogs={sortedBlogs}
+            <Blog
+              blog={blog}
               user={user}
-              expandedId={expandedId}
-              toggleButton={toggleButton}
-              handleLike={handleLike}
-              handleRemove={handleRemove}
+              handleLike={() => handleLike(blog)}
+              handleRemove={() => handleRemove(blog)}
             />
           }
         />

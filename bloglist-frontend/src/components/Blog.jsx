@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 const Blog = ({
   blog,
   expandedId,
@@ -6,7 +7,7 @@ const Blog = ({
   handleLike,
   handleRemove,
 }) => {
-  const isExpanded = expandedId === blog.id;
+  // const isExpanded = expandedId === blog.id;
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -14,31 +15,25 @@ const Blog = ({
     borderWidth: 1,
     marginBottom: 5,
   };
+  if (!blog) return null;
 
   return (
     <div style={blogStyle}>
       <div className="blog">
-        <span>{blog.title}</span> <span>{blog.author}</span>
-        <button
-          onClick={() => {
-            onToggle(blog.id);
-          }}
-        >
-          {isExpanded ? "hide" : "view"}
-        </button>
-        {isExpanded && (
-          <div>
-            <p> {blog.url}</p>
-            <p>
-              likes {blog.likes} <button onClick={handleLike}>like</button>
-            </p>
+        <h2>{blog.title}</h2>
 
-            <p>{blog.user?.username || "unknown user"}</p>
-            {user.username === blog.user?.username && (
-              <button onClick={handleRemove}>remove</button>
-            )}
-          </div>
-        )}
+        <div>
+          <a href={blog.url}> {blog.url}</a>
+
+          <p>
+            likes {blog.likes}{" "}
+            {user && <button onClick={handleLike}>like</button>}
+          </p>
+          <p>Added by {blog.author}</p>
+          {user?.username === blog.user?.username && (
+            <button onClick={handleRemove}>remove</button>
+          )}
+        </div>
       </div>
     </div>
   );
