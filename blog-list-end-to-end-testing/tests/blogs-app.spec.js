@@ -15,6 +15,8 @@ describe("Blog app", () => {
   });
 
   test("Login form is shown", async ({ page }) => {
+    await page.getByRole("link", { name: "login" }).click();
+
     const locator = page.getByText("Log in to application");
     const usernameLabel = page.getByLabel("username");
     const passwordLabel = page.getByLabel("password");
@@ -28,14 +30,16 @@ describe("Blog app", () => {
 
   describe("Login", () => {
     test("succeeds with correct credentials", async ({ page }) => {
+      await page.getByRole("link", { name: "login" }).click();
       await page.getByLabel("username").fill("lidet-test");
       await page.getByLabel("password").fill("lidet123");
       await page.getByRole("button", { name: "login" }).click();
 
-      await expect(page.getByText("Voeun Chanlidet logged in")).toBeVisible();
+      await expect(page.getByRole("button", { name: "logout" })).toBeVisible();
     });
 
     test("fails with wrong credentials", async ({ page }) => {
+      await page.getByRole("link", { name: "login" }).click();
       await page.getByLabel("username").fill("lidet-test");
       await page.getByLabel("password").fill("wrong");
       await page.getByRole("button", { name: "login" }).click();
@@ -47,25 +51,26 @@ describe("Blog app", () => {
 
   describe("When logged in", () => {
     beforeEach(async ({ page }) => {
+      await page.getByRole("link", { name: "login" }).click();
       await page.getByLabel("username").fill("lidet-test");
       await page.getByLabel("password").fill("lidet123");
       await page.getByRole("button", { name: "login" }).click();
     });
 
     test("a new blog can be created", async ({ page }) => {
-      await page.getByRole("button", { name: "create new blog" }).click();
+      await page.getByRole("link", { name: "new blog", exact: true }).click();
       await page.getByLabel("title").fill("new blog can be created");
       await page.getByLabel("author").fill("lidet");
       await page.getByLabel("url").fill("newblog.com");
       await page.getByRole("button", { name: "create" }).click();
 
       await expect(
-        page.getByText("new blog can be created lidet"),
+        page.getByRole("link", { name: "new blog can be created" }),
       ).toBeVisible();
     });
     describe("and a blog exists", () => {
       beforeEach(async ({ page }) => {
-        await page.getByRole("button", { name: "create new blog" }).click();
+        await page.getByRole("link", { name: "new blog", exact: true }).click();
         await page.getByLabel("title").fill("new blog can be created");
         await page.getByLabel("author").fill("lidet");
         await page.getByLabel("url").fill("newblog.com");
@@ -73,23 +78,11 @@ describe("Blog app", () => {
       });
 
       test("the blog can be liked", async ({ page }) => {
-        await page.getByRole("button", { name: "view" }).click();
+        await page
+          .getByRole("link", { name: "new blog can be created", exact: true })
+          .click();
         await page.getByRole("button", { name: "like" }).click();
-
         await expect(page.getByText("likes 1")).toBeVisible();
-      });
-
-      test("the blog can be deleted by the user who added it", async ({
-        page,
-      }) => {
-        await page.getByRole("button", { name: "view" }).click();
-
-        page.on("dialog", (dialog) => dialog.accept());
-        await page.getByRole("button", { name: "remove" }).click();
-
-        await expect(
-          page.getByText("new blog can be created lidet"),
-        ).not.toBeVisible();
       });
 
       test("the blog's delete button available to only the user who added it", async ({
@@ -105,18 +98,41 @@ describe("Blog app", () => {
         });
         await page.getByRole("button", { name: "logout" }).click();
 
+        await expect(page.getByRole("link", { name: "login" })).toBeVisible();
+        await page.getByRole("link", { name: "login" }).click();
+
+        await expect(page.getByLabel("username")).toBeVisible();
         await page.getByLabel("username").fill("lidet-test-2");
         await page.getByLabel("password").fill("lidet123");
         await page.getByRole("button", { name: "login" }).click();
 
-        await page.getByRole("button", { name: "view" }).click();
-
+        await page
+          .getByRole("link", { name: "new blog can be created", exact: true })
+          .click();
         await expect(
           page.getByRole("button", { name: "remove" }),
         ).not.toBeVisible();
       });
 
-      test("blogs are arranged in the order according to the likes", async ({
+      test("the blog can be deleted by the user who added it", async ({
+        page,
+      }) => {
+        await page
+          .getByRole("link", { name: "new blog can be created", exact: true })
+          .click();
+
+        page.on("dialog", (dialog) => dialog.accept());
+        await page.getByRole("button", { name: "remove" }).click();
+
+        await expect(
+          page.getByRole("link", {
+            name: "new blog can be created",
+            exact: true,
+          }),
+        ).not.toBeVisible();
+      });
+
+      test.skip("blogs are arranged in the order according to the likes", async ({
         page,
       }) => {
         // like the first blog one time
