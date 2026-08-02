@@ -1,41 +1,45 @@
-import { useParams } from "react-router-dom";
-const Blog = ({
-  blog,
-  expandedId,
-  onToggle,
-  user,
-  handleLike,
-  handleRemove,
-}) => {
-  // const isExpanded = expandedId === blog.id;
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-  if (!blog) return null;
+import { Card, CardContent, Typography, Button, Stack } from "@mui/material";
+
+const Blog = ({ blog, user, handleLike, handleRemove }) => {
+  if (!blog) {
+    return null;
+  }
 
   return (
-    <div style={blogStyle}>
-      <div className="blog">
-        <h2>{blog.title}</h2>
+    <Card sx={{ maxWidth: 500, marginTop: 2 }}>
+      <CardContent>
+        <Typography variant="h5" component="div">
+          {blog.title}
+        </Typography>
+        <Typography sx={{ my: 1, color: "text.secondary" }}>
+          by {blog.author}
+        </Typography>
+        <Typography variant="body2">
+          <a href={blog.url}>{blog.url}</a>
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{ my: 1, color: "gray", color: "text.secondary" }}
+        >
+          Added by {blog.user?.username || "unknown user"}
+        </Typography>
 
-        <div>
-          <a href={blog.url}> {blog.url}</a>
-
-          <p>
-            likes {blog.likes}{" "}
-            {user && <button onClick={handleLike}>like</button>}
-          </p>
-          <p>Added by {blog.author}</p>
-          {user?.username === blog.user?.username && (
-            <button onClick={handleRemove}>remove</button>
+        <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+          <Typography sx={{ mt: 1 }}>{blog.likes} likes</Typography>
+          {user && (
+            <Button variant="contained" onClick={handleLike}>
+              like
+            </Button>
           )}
-        </div>
-      </div>
-    </div>
+          {user?.username === blog.user?.username && (
+            <Button variant="outlined" color="error" onClick={handleRemove}>
+              remove
+            </Button>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
+
 export default Blog;
