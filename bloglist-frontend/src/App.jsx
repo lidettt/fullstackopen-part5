@@ -8,15 +8,14 @@ import BlogList from "./components/BlogList";
 import "./index.css";
 import LoginForm from "./components/LoginForm";
 import Notification from "./components/Notification";
+import { Container, AppBar, Toolbar, Button } from "@mui/material";
+
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [notification, setNotification] = useState({
-    message: null,
-    type: null,
-  });
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,20 +60,20 @@ const App = () => {
       const blog = await blogService.create(blogObject);
       setBlogs(blogs.concat(blog));
       setNotification({
-        message: `A new blog "${blogObject.title}" by ${blogObject.author} added`,
-        type: "added",
+        text: `a new blog ${blogObject.title} ${blogObject.author} added`,
+        type: "success",
       });
       setTimeout(() => {
-        setNotification({ message: null, type: null });
+        setNotification(null);
       }, 5000);
       navigate("/");
-    } catch {
+    } catch (error) {
       setNotification({
-        message: "Failed to create blog, Please try again",
+        text: "Failed to create blog, Please try again",
         type: "error",
       });
       setTimeout(() => {
-        setNotification({ message: null, type: null });
+        setNotification(null);
       }, 5000);
     }
   };
@@ -123,36 +122,50 @@ const App = () => {
   const padding = {
     padding: 5,
   };
-
+  const style = { "&:hover": { bgcolor: "rgba(255,255,255,0.3)" } };
   return (
-    <div>
-      {notification && <Notification notification={notification} />}
-      <div>
-        <Link style={padding} to="/">
-          blogs
-        </Link>
+    <Container>
+      <AppBar position="static">
+        <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
+          <h2>Blog App</h2>
+          <div>
+            {" "}
+            <Button color="inherit" component={Link} to="/" sx={style}>
+              blogs
+            </Button>
+            {user ? (
+              <>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/create"
+                  sx={style}
+                >
+                  new blog
+                </Button>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  sx={style}
+                  onClick={() => {
+                    window.localStorage.removeItem("loggedBloglistUser");
+                    setUser(null);
+                    navigate("/");
+                  }}
+                >
+                  logout
+                </Button>
+              </>
+            ) : (
+              <Button color="inherit" component={Link} to="/login" sx={style}>
+                login
+              </Button>
+            )}
+          </div>
+        </Toolbar>
+      </AppBar>
+      <Notification notification={notification} />
 
-        {user ? (
-          <>
-            <Link style={padding} to="/create">
-              new blog
-            </Link>
-            <button
-              onClick={() => {
-                window.localStorage.removeItem("loggedBloglistUser");
-                setUser(null);
-                navigate("/");
-              }}
-            >
-              logout
-            </button>
-          </>
-        ) : (
-          <Link style={padding} to="/login">
-            login
-          </Link>
-        )}
-      </div>
       <Routes>
         <Route path="/" element={<BlogList sortedBlogs={sortedBlogs} />} />
         <Route path="/create" element={<BlogForm createBlog={addBlog} />} />
@@ -181,7 +194,7 @@ const App = () => {
           }
         />
       </Routes>
-    </div>
+    </Container>
   );
 };
 
