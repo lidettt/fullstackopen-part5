@@ -9,92 +9,87 @@ test("renders content", () => {
     author: "Lidet Tester",
     url: "https://example.com",
     likes: 10,
+    user: { username: "lidet-test" },
   };
 
-  render(<Blog blog={blog} expandedId={null} />);
+  render(<Blog blog={blog} user={null} />);
 
   const title = screen.getByText("Testing the blog component");
   expect(title).toBeDefined();
-  const author = screen.getByText("Lidet Tester");
+
+  const url = screen.queryByText("https://example.com");
+  expect(url).not.toBeNull();
+
+  const likes = screen.getByText("likes 10");
+  expect(likes).toBeDefined();
+  const likeButton = screen.queryByRole("button", { name: "like" });
+  expect(likeButton).toBeNull();
+
+  const author = screen.getByText("Added by Lidet Tester");
   expect(author).toBeDefined();
 
-  const url = screen.queryByText("https://example.com");
-  expect(url).toBeNull();
-  const likes = screen.queryByText("10");
-  expect(likes).toBeNull();
+  const removeButton = screen.queryByRole("button", { name: "remove" });
+  expect(removeButton).toBeNull();
 });
 
-test("shows url and likes when view button is clicked", async () => {
+test("authenticated but not blog's creator show only the like button", () => {
   const blog = {
-    id: "1",
     title: "Testing the blog component",
     author: "Lidet Tester",
     url: "https://example.com",
     likes: 10,
+    user: { username: "lidet-test" },
   };
+  const loggedUser = { username: "notcreator" };
 
-  const mockToggle = vi.fn();
+  render(<Blog blog={blog} user={loggedUser} />);
 
-  // render with expandedId set to null (collapsed)
-  const { rerender } = render(
-    <Blog blog={blog} expandedId={null} onToggle={mockToggle} />,
-  );
-
-  //find and await for user to click the button
-  const user = userEvent.setup();
-  const button = screen.getByText("view");
-  await user.click(button);
-
-  //re-render after the user click the button to change the expandedId to blog.id instead of null
-  rerender(<Blog blog={blog} expandedId={blog.id} onToggle={mockToggle} />);
+  const title = screen.getByText("Testing the blog component");
+  expect(title).toBeDefined();
 
   const url = screen.queryByText("https://example.com");
-  expect(url).toBeDefined();
-  const likes = screen.queryByText("10");
+  expect(url).not.toBeNull();
+
+  const likes = screen.getByText("likes 10");
   expect(likes).toBeDefined();
+  const likeButton = screen.queryByRole("button", { name: "like" });
+  expect(likeButton).not.toBeNull();
+
+  const author = screen.getByText("Added by Lidet Tester");
+  expect(author).toBeDefined();
+
+  const removeButton = screen.queryByRole("button", { name: "remove" });
+  expect(removeButton).toBeNull();
 });
-test("check if the like button is clicked twice, the event handler the component received as props is called twice.", async () => {
+
+test("blog's creator show the delete button", () => {
   const blog = {
-    id: "1",
     title: "Testing the blog component",
     author: "Lidet Tester",
     url: "https://example.com",
     likes: 10,
+    user: { username: "lidet-test" },
   };
-  const mockToggle = vi.fn();
-  const mockLikeHandler = vi.fn();
+  const loggedUser = { username: "lidet-test" };
 
-  // render with expandedId set to null (collapsed)
+  render(<Blog blog={blog} user={loggedUser} />);
 
-  const { rerender } = render(
-    <Blog
-      blog={blog}
-      expandedId={null}
-      onToggle={mockToggle}
-      handleLike={mockLikeHandler}
-    />,
-  );
+  const title = screen.getByText("Testing the blog component");
+  expect(title).toBeDefined();
 
-  //find and await for user to click the view to expand the blog first (show like button)
-  const user = userEvent.setup();
-  const button = screen.getByText("view");
-  await user.click(button);
-  //re-render after clicked the view button to pass the blog props update the state
-  rerender(
-    <Blog
-      blog={blog}
-      expandedId={blog.id}
-      onToggle={mockToggle}
-      handleLike={mockLikeHandler}
-    />,
-  );
-  //find the like button and await for user to click the like button twice
-  const likeButton = screen.getByText("like");
-  await user.click(likeButton);
-  await user.click(likeButton);
+  const url = screen.queryByText("https://example.com");
+  expect(url).not.toBeNull();
 
-  //check if the handleLike receive props 2 times
-  expect(mockLikeHandler).toHaveBeenCalledTimes(2);
+  const likes = screen.getByText("likes 10");
+  expect(likes).toBeDefined();
+  const likeButton = screen.queryByRole("button", { name: "like" });
+  expect(likeButton).not.toBeNull();
+
+  const author = screen.getByText("Added by Lidet Tester");
+  expect(author).toBeDefined();
+
+  const removeButton = screen.queryByRole("button", { name: "remove" });
+  expect(removeButton).not.toBeNull();
 });
 
 test("check, that the form calls the event handler if it received as props with the right details when a new blog is created", async () => {
