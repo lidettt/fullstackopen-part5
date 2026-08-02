@@ -3,7 +3,6 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import BlogForm from "./components/BlogForm";
-import Togglable from "./components/Togglable";
 import { Routes, Route, Link, useNavigate, useMatch } from "react-router-dom";
 import BlogList from "./components/BlogList";
 import "./index.css";
@@ -14,14 +13,11 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [expandedId, setExpandedId] = useState(null);
   const [notification, setNotification] = useState({
     message: null,
     type: null,
   });
   const navigate = useNavigate();
-
-  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -61,7 +57,6 @@ const App = () => {
   };
 
   const addBlog = async (blogObject) => {
-    blogFormRef.current.toggleVisibility();
     try {
       const blog = await blogService.create(blogObject);
       setBlogs(blogs.concat(blog));
@@ -72,6 +67,7 @@ const App = () => {
       setTimeout(() => {
         setNotification({ message: null, type: null });
       }, 5000);
+      navigate("/");
     } catch {
       setNotification({
         message: "Failed to create blog, Please try again",
@@ -81,9 +77,6 @@ const App = () => {
         setNotification({ message: null, type: null });
       }, 5000);
     }
-  };
-  const toggleButton = (id) => {
-    setExpandedId(expandedId === id ? null : id);
   };
 
   const handleLike = async (blog) => {
@@ -103,6 +96,7 @@ const App = () => {
     try {
       if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
         await blogService.remove(blog.id);
+        navigate("/");
         setBlogs((prevBlogs) => prevBlogs.filter((b) => b.id !== blog.id));
       }
     } catch (error) {
@@ -139,15 +133,20 @@ const App = () => {
         </Link>
 
         {user ? (
-          <button
-            onClick={() => {
-              window.localStorage.removeItem("loggedBloglistUser");
-              setUser(null);
-              navigate("/");
-            }}
-          >
-            logout
-          </button>
+          <>
+            <Link style={padding} to="/create">
+              new blog
+            </Link>
+            <button
+              onClick={() => {
+                window.localStorage.removeItem("loggedBloglistUser");
+                setUser(null);
+                navigate("/");
+              }}
+            >
+              logout
+            </button>
+          </>
         ) : (
           <Link style={padding} to="/login">
             login
@@ -156,6 +155,7 @@ const App = () => {
       </div>
       <Routes>
         <Route path="/" element={<BlogList sortedBlogs={sortedBlogs} />} />
+        <Route path="/create" element={<BlogForm createBlog={addBlog} />} />
         <Route
           path="/blogs/:id"
           element={
